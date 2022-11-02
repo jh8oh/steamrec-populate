@@ -3,40 +3,67 @@ import queryString from "query-string";
 import rateLimit from "axios-rate-limit";
 import fs from "fs";
 
-const http = rateLimit(axios.create(), { maxRPS: 1 });
+import { checkFileExists, readFile } from "./helper.js";
 
-export async function checkSteamDataExists() {
-  return Promise.all([
-    checkFileExists("/data/games.txt"),
-    checkFileExists("/data/categories.txt"),
-    checkFileExists("/data/genres.txt"),
-  ]).then((values) => {
-    return values.every(Boolean);
-  });
+const http = rateLimit(axios.create(), {
+  maxRequests: 2,
+  perMilliseconds: 3000,
+});
+
+var allGames = [];
+var len = 0;
+
+var count = 0;
+var allGamesFull = [];
+var categories = [];
+var genres = [];
+
+export async function loadAllGames() {
+  if (await checkFileExists("./data/allGames.txt")) {
+    allGames = await readFile("./data/allGames.txt")
+      .then((it) => {
+        return JSON.parse(it);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    allGames = await http
+      .get(
+        "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json"
+      )
+      .then((response) => {
+        return response.data.applist.apps;
+      });
+
+    fs.writeFile("/data/allGames.txt", JSON.stringify(allGames), (e) => {
+      if (e) {
+        console.log(e);
+      }
+    });
+  }
+
+  len = allGames.length;
 }
 
-async function checkFileExists(file) {
-  return fs.promises
-    .access(file, fs.constants.F_OK)
-    .then(() => true)
-    .catch(() => false);
-}
-
-export async function saveSteamData() {
-  const allGamesFull = [];
-  const categories = [];
-  const genres = [];
-
-  // Get all games from steam
-  const allGames = await http
-    .get("http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json")
-    .then((response) => {
-      return response.data.applist.apps;
+export async function loadSteamData() {
+  if (await checkFileExists("./data/data.txt")) {
+    const dataJSON = await readFile("./data/data.txt").then((it) => {
+      return JSON.parse(it);
     });
 
-  // For each game...
-  for (const game of allGames) {
-    const id = game.appid;
+    count = dataJSON.count;
+    allGamesFull = dataJSON.allGamesFull;
+    categories = dataJSON.categories;
+    genres = dataJSON.genres;
+  }
+}
+
+export async function getSteamData() {
+  for (; count < len; count++) {
+    const id = allGames[count].appid;
+
+    console.log(`${count}/${len} - ${id}`);
 
     // Grab relevant app data
     const url = "https://store.steampowered.com/api/appdetails?";
@@ -44,21 +71,12 @@ export async function saveSteamData() {
       appids: id,
     });
     const appDetailsResponse = await http.get(url + query).catch((error) => {
-      if (error.response) {
-        // Request made but the server responded with an error
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } else if (error.request) {
-        // Request made but no response is received from the server.
-        console.log(error.request);
-      } else {
-        // Error occured while setting up the request
-        console.log("Error", error.message);
-      }
+      throw error;
     });
 
     // If failure, then skip this app
+    if (appDetailsResponse == null) continue;
+    if (appDetailsResponse.data[id] == null) continue;
     if (!appDetailsResponse.data[id].success) continue;
 
     const gameData = appDetailsResponse.data[id].data;
@@ -117,25 +135,17 @@ export async function saveSteamData() {
 
     allGamesFull.push(gameFull);
   }
+}
 
-  // Stringify JSON
-  const allGamesFullStringify = JSON.stringify(allGamesFull);
-  const categoriesStringify = JSON.stringify(categories);
-  const genresStringify = JSON.stringify(genres);
+export function saveSteamData() {
+  var data = {};
 
-  fs.writeFile("/data/games.txt", allGamesFullStringify, (e) => {
-    if (e) {
-      console.log(e);
-    }
-  });
+  data.count = count;
+  data.allGamesFull = allGamesFull;
+  data.categories = categories;
+  data.genres = genres;
 
-  fs.writeFile("/data/categories.txt", categoriesStringify, (e) => {
-    if (e) {
-      console.log(e);
-    }
-  });
-
-  fs.writeFile("/data/genres.txt", genresStringify, (e) => {
+  fs.writeFile("./data/data.txt", JSON.stringify(data), (e) => {
     if (e) {
       console.log(e);
     }

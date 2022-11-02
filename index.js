@@ -1,7 +1,18 @@
-import { checkSteamDataExists, saveSteamData } from "./src/data.js";
+import {
+  loadAllGames,
+  loadSteamData,
+  getSteamData,
+  saveSteamData,
+} from "./src/steam.js";
 
-const steamDataExists = await checkSteamDataExists()
+// Load all data
+await loadAllGames();
+await loadSteamData();
 
-if (!steamDataExists){
-    await saveSteamData()
-}
+getSteamData()
+  .catch((e) => {
+    console.log(e);
+  })
+  .finally(() =>{
+    saveSteamData();
+  });
