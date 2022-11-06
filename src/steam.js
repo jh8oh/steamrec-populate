@@ -120,6 +120,12 @@ export async function getSteamData() {
     const gameFull = {};
     gameFull.id = id;
     gameFull.name = gameData.name;
+    gameFull.type = gameData.type;
+    if (gameData.fullgame != null) {
+      gameFull.baseGameId = gameData.fullgame.appid;
+    } else {
+      gameFull.baseGameId = null;
+    }
     gameFull.developers = gameData.developers;
     gameFull.publishers = gameData.publishers;
     gameFull.categories = nonNullCategories.map((c) => {
