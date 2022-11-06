@@ -145,9 +145,20 @@ export async function getSteamData() {
     } else {
       gameFull.metacritic = null;
     }
+    if (gameData.content_descriptors.ids != null) {
+      if (areArraysEqual(gameData.content_descriptors.ids, [1, 3, 5])) {
+        gameFull.adult = true;
+      } else {
+        gameFull.adult = false;
+      }
+    }
 
     allGamesFull.push(gameFull);
   }
+}
+
+function areArraysEqual(a, b) {
+  return JSON.stringify(a) == JSON.stringify(b);
 }
 
 export function saveSteamData() {
