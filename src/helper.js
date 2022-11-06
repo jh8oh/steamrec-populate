@@ -2,9 +2,9 @@ import fs from "fs";
 
 export async function checkFileExists(file) {
   return await fs.promises
-    .access(file)
+    .access(file, fs.constants.F_OK)
     .then(() => true)
-    .catch((e) => false);
+    .catch(() => false);
 }
 
 export function readFile(file) {

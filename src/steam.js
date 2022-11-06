@@ -28,7 +28,7 @@ export async function loadAllGames() {
         console.log(err);
       });
   } else {
-    allGames = await http
+    const preCheck = await http
       .get(
         "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json"
       )
@@ -36,7 +36,9 @@ export async function loadAllGames() {
         return response.data.applist.apps;
       });
 
-    fs.writeFile("/data/allGames.txt", JSON.stringify(allGames), (e) => {
+    allGames = removeDuplicateGame(preCheck);
+
+    fs.writeFile("./data/allGames.txt", JSON.stringify(allGames), (e) => {
       if (e) {
         console.log(e);
       }
@@ -44,6 +46,11 @@ export async function loadAllGames() {
   }
 
   len = allGames.length;
+}
+
+function removeDuplicateGame(games) {
+  var check = new Set();
+  return games.filter((obj) => !check.has(obj.appid) && check.add(obj.appid));
 }
 
 export async function loadSteamData() {
