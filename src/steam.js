@@ -6,8 +6,8 @@ import fs from "fs";
 import { checkFileExists, readFile } from "./helper.js";
 
 const http = rateLimit(axios.create(), {
-  maxRequests: 2,
-  perMilliseconds: 3000,
+  maxRequests: 1,
+  perMilliseconds: 1500,
 });
 
 var allGames = [];
