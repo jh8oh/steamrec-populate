@@ -25,6 +25,7 @@ async function insertGames() {
 
   filterExisting("games", allGamesFull)
     .then((filteredAllGamesFull) => {
+      console.log(`Inserting ${filteredAllGamesFull.length} games`);
       if (filteredAllGamesFull.length > 0) {
         insert("games", filteredAllGamesFull);
       }
@@ -43,6 +44,7 @@ async function insertCategories() {
 
   filterExisting("categories", categories)
     .then((filteredCategories) => {
+      console.log(`Inserting ${filteredCategories.length} categories`);
       if (filteredCategories.length > 0) {
         insert("categories", filteredCategories);
       }
@@ -59,6 +61,7 @@ async function insertGenres() {
 
   filterExisting("genres", genres)
     .then((filteredGenres) => {
+      console.log(`Inserting ${filteredGenres.length} genres`);
       if (filteredGenres.length > 0) {
         insert("genres", filteredGenres);
       }
@@ -75,15 +78,14 @@ async function filterExisting(collectionName, objArray) {
         client
           .db("steamrec")
           .collection(collectionName)
-          .find({}, { _id: 1 })
-          .toArray()
-          .then((array) =>
-            resolve(
-              objArray.filter(
-                (obj) => !array.map((it) => it._id).includes(obj._id)
-              )
-            )
-          )
+          .distinct("_id")
+          .then((array) => {
+            let intArray = array.map((it) => parseInt(it));
+
+            return resolve(
+              objArray.filter((obj) => !intArray.includes(obj._id))
+            );
+          })
           .catch((err) => reject(err))
           .finally(() => {
             client.close();

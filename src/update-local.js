@@ -134,7 +134,7 @@ async function addMissingGames(missingIds) {
     }
 
     nonNullCategories.forEach((gameCategory) => {
-      if (!categories.find((c) => c.id == gameCategory.id)) {
+      if (!categories.find((c) => c._id == gameCategory.id)) {
         gameCategory._id = gameCategory.id;
         delete gameCategory.id;
 
@@ -143,7 +143,7 @@ async function addMissingGames(missingIds) {
     });
 
     nonNullGenres.forEach((gameGenre) => {
-      if (!genres.find((g) => g.id == gameGenre.id)) {
+      if (!genres.find((g) => g._id == gameGenre.id)) {
         gameGenre._id = gameGenre.id;
         delete gameGenre.id;
 
