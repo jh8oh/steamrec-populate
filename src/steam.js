@@ -3,7 +3,7 @@ import queryString from "query-string";
 import rateLimit from "axios-rate-limit";
 import fs from "fs";
 
-import { loadAllGamesFromFile, loadDataFromFile } from "./load.js";
+import { loadFromFile } from "./load.js";
 
 const http = rateLimit(axios.create(), {
   maxRequests: 1,
@@ -19,7 +19,7 @@ var categories = [];
 var genres = [];
 
 export async function loadAllGames() {
-  await loadAllGamesFromFile()
+  await loadFromFile("./data/allGames.txt")
     .then((it) => {
       allGames = it;
     })
@@ -49,7 +49,7 @@ function removeDuplicateGame(games) {
 }
 
 export async function loadSteamData() {
-  await loadDataFromFile()
+  await loadFromFile("./data/data.txt")
     .then((it) => {
       count = it.count;
       allGamesFull = dit.allGamesFull;

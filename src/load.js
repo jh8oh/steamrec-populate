@@ -1,21 +1,11 @@
 import fs from "fs";
 
-export async function loadAllGamesFromFile() {
-  if (!(await checkFileExists("./data/allGames.txt"))) {
-    return Promise.reject(new Error("allGames does not exist"));
+export async function loadFromFile(path) {
+  if (!(await checkFileExists(path))) {
+    return Promise.reject(new Error(`${path} does not exist`));
   }
   
-  return readFile("./data/allGames.txt").then((it) => {
-    return JSON.parse(it);
-  });
-}
-
-export async function loadDataFromFile() {
-  if (await checkFileExists("./data/data.txt")) {
-    return Promise.reject(new Error("data does not exist"));
-  }
-
-  return readFile("./data/data.txt").then((it) => {
+  return readFile(path).then((it) => {
     return JSON.parse(it);
   });
 }
