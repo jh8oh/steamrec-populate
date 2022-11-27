@@ -23,7 +23,8 @@ export async function loadAllGames() {
     .then((it) => {
       allGames = it;
     })
-    .catch(() => {
+    .catch((err) => {
+      console.log(err)
       http
         .get(
           "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json"
@@ -52,11 +53,12 @@ export async function loadSteamData() {
   await loadFromFile("./data/data.txt")
     .then((it) => {
       count = it.count;
-      allGamesFull = dit.allGamesFull;
+      allGamesFull = it.allGamesFull;
       categories = it.categories;
       genres = it.genres;
     })
-    .catch(() => {
+    .catch((err) => {
+      console.log(err)
       count = 0;
       allGamesFull = [];
       categories = [];

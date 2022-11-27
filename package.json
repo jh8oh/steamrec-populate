@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "save-local": "node save-local.js"
+    "save-local": "node ./src/save-local.js"
   },
   "keywords": [],
   "author": "",

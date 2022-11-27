@@ -3,7 +3,7 @@ import {
   loadSteamData,
   getSteamData,
   saveSteamData,
-} from "./src/steam.js";
+} from "./functions/steam.js";
 
 // Load all data
 await loadAllGames();
