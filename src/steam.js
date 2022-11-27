@@ -3,7 +3,7 @@ import queryString from "query-string";
 import rateLimit from "axios-rate-limit";
 import fs from "fs";
 
-import { checkFileExists, readFile } from "./helper.js";
+import { loadAllGamesFromFile, loadDataFromFile } from "./load.js";
 
 const http = rateLimit(axios.create(), {
   maxRequests: 1,
@@ -19,33 +19,28 @@ var categories = [];
 var genres = [];
 
 export async function loadAllGames() {
-  if (await checkFileExists("./data/allGames.txt")) {
-    allGames = await readFile("./data/allGames.txt")
-      .then((it) => {
-        return JSON.parse(it);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  } else {
-    const preCheck = await http
-      .get(
-        "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json"
-      )
-      .then((response) => {
-        return response.data.applist.apps;
-      });
+  await loadAllGamesFromFile()
+    .then((it) => {
+      allGames = it;
+    })
+    .catch(() => {
+      http
+        .get(
+          "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json"
+        )
+        .then((response) => {
+          allGames = removeDuplicateGame(response.data.applist.apps);
 
-    allGames = removeDuplicateGame(preCheck);
-
-    fs.writeFile("./data/allGames.txt", JSON.stringify(allGames), (e) => {
-      if (e) {
-        console.log(e);
-      }
+          fs.writeFile("./data/allGames.txt", JSON.stringify(allGames), (e) => {
+            if (e) {
+              console.log(e);
+            }
+          });
+        });
+    })
+    .finally(() => {
+      len = allGames.length;
     });
-  }
-
-  len = allGames.length;
 }
 
 function removeDuplicateGame(games) {
@@ -54,16 +49,19 @@ function removeDuplicateGame(games) {
 }
 
 export async function loadSteamData() {
-  if (await checkFileExists("./data/data.txt")) {
-    const dataJSON = await readFile("./data/data.txt").then((it) => {
-      return JSON.parse(it);
+  await loadDataFromFile()
+    .then((it) => {
+      count = it.count;
+      allGamesFull = dit.allGamesFull;
+      categories = it.categories;
+      genres = it.genres;
+    })
+    .catch(() => {
+      count = 0;
+      allGamesFull = [];
+      categories = [];
+      genres = [];
     });
-
-    count = dataJSON.count;
-    allGamesFull = dataJSON.allGamesFull;
-    categories = dataJSON.categories;
-    genres = dataJSON.genres;
-  }
 }
 
 export async function getSteamData() {
@@ -161,7 +159,7 @@ function areArraysEqual(a, b) {
   return JSON.stringify(a) == JSON.stringify(b);
 }
 
-export function saveSteamData() {
+export async function saveSteamData() {
   var data = {};
 
   data.count = count;
@@ -170,6 +168,24 @@ export function saveSteamData() {
   data.genres = genres;
 
   fs.writeFile("./data/data.txt", JSON.stringify(data), (e) => {
+    if (e) {
+      console.log(e);
+    }
+  });
+
+  fs.writeFile("./data/allGamesFull.txt", JSON.stringify(allGamesFull), (e) => {
+    if (e) {
+      console.log(e);
+    }
+  });
+
+  fs.writeFile("./data/categories.txt", JSON.stringify(categories), (e) => {
+    if (e) {
+      console.log(e);
+    }
+  });
+
+  fs.writeFile("./data/genres.txt", JSON.stringify(genres), (e) => {
     if (e) {
       console.log(e);
     }
