@@ -201,12 +201,6 @@ async function fetchSteamData() {
 }
 
 async function saveSteamData() {
-  var data = {};
-
-  data.allGamesFull = allGamesFull;
-  data.categories = categories;
-  data.genres = genres;
-
   fs.writeFile("./data/allGamesFull.txt", JSON.stringify(allGamesFull), (e) => {
     if (e) {
       console.log(e);
