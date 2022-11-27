@@ -25,7 +25,9 @@ async function insertGames() {
 
   filterExisting("games", allGamesFull)
     .then((filteredAllGamesFull) => {
-      insert("games", filteredAllGamesFull);
+      if (filteredAllGamesFull.length > 0) {
+        insert("games", filteredAllGamesFull);
+      }
     })
     .catch((err) => {
       throw err;
@@ -41,7 +43,9 @@ async function insertCategories() {
 
   filterExisting("categories", categories)
     .then((filteredCategories) => {
-      insert("categories", filteredCategories);
+      if (filteredCategories.length > 0) {
+        insert("categories", filteredCategories);
+      }
     })
     .catch((err) => {
       throw err;
@@ -55,7 +59,9 @@ async function insertGenres() {
 
   filterExisting("genres", genres)
     .then((filteredGenres) => {
-      insert("genres", filteredGenres);
+      if (filteredGenres.length > 0) {
+        insert("genres", filteredGenres);
+      }
     })
     .catch((err) => {
       throw err;
