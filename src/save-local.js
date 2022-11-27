@@ -118,10 +118,16 @@ async function fetchSteamData() {
       throw error;
     });
 
-    // If failure, then skip this app
-    if (appDetailsResponse == null) continue;
-    if (appDetailsResponse.data[id] == null) continue;
-    if (!appDetailsResponse.data[id].success) continue;
+    // If failure, then skip this app and add to rejected
+    if (
+      appDetailsResponse == null ||
+      appDetailsResponse.data[id] == null ||
+      !appDetailsResponse.data[id].success
+    ) {
+      rejectedGamesId.push(id);
+      console.log(`${i}/${len} - ${id} - rejected`);
+      continue;
+    }
 
     const gameData = appDetailsResponse.data[id].data;
 
@@ -197,10 +203,18 @@ async function fetchSteamData() {
     }
 
     allGamesFull.push(gameFull);
+
+    console.log(`${i}/${len} - ${id} - accepted`);
   }
 }
 
 async function saveSteamData() {
+  fs.writeFile("./data/count.txt", count, (e) => {
+    if (e) {
+      console.log(e);
+    }
+  });
+
   fs.writeFile("./data/allGamesFull.txt", JSON.stringify(allGamesFull), (e) => {
     if (e) {
       console.log(e);

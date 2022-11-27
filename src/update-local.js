@@ -100,7 +100,7 @@ async function addMissingGames(missingIds) {
       throw error;
     });
 
-    // If failure, then skip this app
+    // If failure, then skip this app and add to rejected
     if (
       appDetailsResponse == null ||
       appDetailsResponse.data[id] == null ||
