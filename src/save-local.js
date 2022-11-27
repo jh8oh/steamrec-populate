@@ -3,7 +3,7 @@ import queryString from "query-string";
 import rateLimit from "axios-rate-limit";
 import fs from "fs";
 
-import { loadFromFile, removeDuplicate, areArraysEqual } from "./functions/helper.js";
+import { loadFromFile, removeDuplicate, areArraysEqual } from "./helper.js";
 
 const http = rateLimit(axios.create(), {
   maxRequests: 1,
