@@ -11,18 +11,19 @@ const http = rateLimit(axios.create(), {
   perMilliseconds: 1500,
 });
 
-var allGames = [];
+var allGamesId = [];
 var len = 0;
 
+var count = 0;
 var allGamesFull = [];
 var categories = [];
 var genres = [];
 
 // Load all data
-await loadAllGames();
-await loadSteamData();
+await fetchAllGames();
+await loadLocalData();
 
-getSteamData()
+fetchSteamData()
   .catch((e) => {
     console.log(e);
   })
@@ -30,10 +31,10 @@ getSteamData()
     saveSteamData();
   });
 
-async function loadAllGames() {
-  await loadFromFile("./data/allGamesId.txt")
+async function fetchAllGames() {
+  loadFromFile("./data/allGamesId.txt", true)
     .then((it) => {
-      allGames = it;
+      allGamesId = it;
     })
     .catch((err) => {
       console.log(err);
@@ -42,41 +43,63 @@ async function loadAllGames() {
           "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json"
         )
         .then((response) => {
-          allGames = removeDuplicate(
+          allGamesId = removeDuplicate(
             response.data.applist.apps.map((app) => app.appid)
           );
 
-          fs.writeFile("./data/allGamesId.txt", JSON.stringify(allGames), (e) => {
-            if (e) {
-              console.log(e);
+          fs.writeFile(
+            "./data/allGamesId.txt",
+            JSON.stringify(allGamesId),
+            (e) => {
+              if (e) {
+                console.log(e);
+              }
             }
-          });
+          );
         });
     })
     .finally(() => {
-      len = allGames.length;
+      len = allGamesId.length;
     });
 }
 
-async function loadSteamData() {
-  await loadFromFile("./data/data.txt")
+async function loadLocalData() {
+  await loadFromFile("./data/allGamesFull.txt", true)
     .then((it) => {
-      allGamesFull = it.allGamesFull;
-      categories = it.categories;
-      genres = it.genres;
+      allGamesFull = it;
     })
     .catch((err) => {
       console.log(err);
+    });
 
-      allGamesFull = [];
-      categories = [];
-      genres = [];
+  await loadFromFile("./data/categories.txt", true)
+    .then((it) => {
+      categories = it;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  await loadFromFile("./data/genres.txt", true)
+    .then((it) => {
+      genres = it;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  await loadFromFile("./data/count.txt", false)
+    .then((it) => {
+      count = parseInt(it);
+    })
+    .catch((err) => {
+      console.log(err);
     });
 }
 
-async function getSteamData() {
-  for (let count = 0; count < len; count++) {
-    const id = allGames[count].appid;
+async function fetchSteamData() {
+  for (; count < len; count++) {
+    const id = allGamesId[count];
 
     console.log(`${count}/${len} - ${id}`);
 

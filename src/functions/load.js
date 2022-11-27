@@ -1,12 +1,16 @@
 import fs from "fs";
 
-export async function loadFromFile(path) {
+export async function loadFromFile(path, isJson) {
   if (!(await checkFileExists(path))) {
     return Promise.reject(new Error(`${path} does not exist`));
   }
-  
+
   return readFile(path).then((it) => {
-    return JSON.parse(it);
+    if (isJson) {
+      return JSON.parse(it);
+    } else {
+      return it;
+    }
   });
 }
 
