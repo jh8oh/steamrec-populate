@@ -74,16 +74,20 @@ async function getIdDifferences() {
 async function addMissingGames(missingIds) {
   [allGamesFull, categories, genres, rejectedGamesId] = await Promise.all([
     loadFromFile("./data/allGamesFull.txt", true).catch((err) => {
+      console.log(err);
       return [];
     }),
     await loadFromFile("./data/categories.txt", true).catch((err) => {
+      console.log(err);
       return [];
     }),
 
     await loadFromFile("./data/genres.txt", true).catch((err) => {
+      console.log(err);
       return [];
     }),
     loadFromFile("./data/rejectedGamesId.txt", true).catch((err) => {
+      console.log(err);
       return [];
     }),
   ]);
@@ -208,4 +212,14 @@ async function saveSteamData() {
       console.log(e);
     }
   });
+
+  fs.writeFile(
+    "./data/rejectedGamesId.txt",
+    JSON.stringify(rejectedGamesId),
+    (e) => {
+      if (e) {
+        console.log(e);
+      }
+    }
+  );
 }
