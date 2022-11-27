@@ -70,7 +70,7 @@ async function fetchAllGames() {
 }
 
 async function loadLocalData() {
-  await loadFromFile("./data/allGamesFull.txt", true)
+  loadFromFile("./data/allGamesFull.txt", true)
     .then((it) => {
       allGamesFull = it;
     })
@@ -78,7 +78,7 @@ async function loadLocalData() {
       console.log(err);
     });
 
-  await loadFromFile("./data/categories.txt", true)
+  loadFromFile("./data/categories.txt", true)
     .then((it) => {
       categories = it;
     })
@@ -86,7 +86,7 @@ async function loadLocalData() {
       console.log(err);
     });
 
-  await loadFromFile("./data/genres.txt", true)
+  loadFromFile("./data/genres.txt", true)
     .then((it) => {
       genres = it;
     })
@@ -94,7 +94,7 @@ async function loadLocalData() {
       console.log(err);
     });
 
-  await loadFromFile("./data/count.txt", false)
+  loadFromFile("./data/count.txt", false)
     .then((it) => {
       count = parseInt(it);
     })
