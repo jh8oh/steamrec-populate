@@ -13,7 +13,6 @@ const http = rateLimit(axios.create(), {
 var allGames = [];
 var len = 0;
 
-var count = 0;
 var allGamesFull = [];
 var categories = [];
 var genres = [];
@@ -52,14 +51,13 @@ function removeDuplicateGame(games) {
 export async function loadSteamData() {
   await loadFromFile("./data/data.txt")
     .then((it) => {
-      count = it.count;
       allGamesFull = it.allGamesFull;
       categories = it.categories;
       genres = it.genres;
     })
     .catch((err) => {
       console.log(err)
-      count = 0;
+
       allGamesFull = [];
       categories = [];
       genres = [];
@@ -67,7 +65,7 @@ export async function loadSteamData() {
 }
 
 export async function getSteamData() {
-  for (; count < len; count++) {
+  for (let count = 0; count < len; count++) {
     const id = allGames[count].appid;
 
     console.log(`${count}/${len} - ${id}`);
@@ -164,16 +162,9 @@ function areArraysEqual(a, b) {
 export async function saveSteamData() {
   var data = {};
 
-  data.count = count;
   data.allGamesFull = allGamesFull;
   data.categories = categories;
   data.genres = genres;
-
-  fs.writeFile("./data/data.txt", JSON.stringify(data), (e) => {
-    if (e) {
-      console.log(e);
-    }
-  });
 
   fs.writeFile("./data/allGamesFull.txt", JSON.stringify(allGamesFull), (e) => {
     if (e) {
