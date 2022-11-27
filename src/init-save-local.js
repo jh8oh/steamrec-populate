@@ -4,6 +4,7 @@ import rateLimit from "axios-rate-limit";
 import fs from "fs";
 
 import { loadFromFile } from "./functions/load.js";
+import { removeDuplicate, areArraysEqual } from "./functions/helper.js";
 
 const http = rateLimit(axios.create(), {
   maxRequests: 1,
@@ -30,7 +31,7 @@ getSteamData()
   });
 
 async function loadAllGames() {
-  await loadFromFile("./data/allGames.txt")
+  await loadFromFile("./data/allGamesId.txt")
     .then((it) => {
       allGames = it;
     })
@@ -41,9 +42,11 @@ async function loadAllGames() {
           "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json"
         )
         .then((response) => {
-          allGames = removeDuplicateGame(response.data.applist.apps);
+          allGames = removeDuplicate(
+            response.data.applist.apps.map((app) => app.appid)
+          );
 
-          fs.writeFile("./data/allGames.txt", JSON.stringify(allGames), (e) => {
+          fs.writeFile("./data/allGamesId.txt", JSON.stringify(allGames), (e) => {
             if (e) {
               console.log(e);
             }
@@ -53,11 +56,6 @@ async function loadAllGames() {
     .finally(() => {
       len = allGames.length;
     });
-}
-
-function removeDuplicateGame(games) {
-  var check = new Set();
-  return games.filter((obj) => !check.has(obj.appid) && check.add(obj.appid));
 }
 
 async function loadSteamData() {
@@ -165,10 +163,6 @@ async function getSteamData() {
 
     allGamesFull.push(gameFull);
   }
-}
-
-function areArraysEqual(a, b) {
-  return JSON.stringify(a) == JSON.stringify(b);
 }
 
 async function saveSteamData() {
