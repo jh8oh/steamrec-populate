@@ -5,6 +5,19 @@ import fs from "fs";
 
 import { loadFromFile, removeDuplicate, areArraysEqual } from "./helper.js";
 
+const http = rateLimit(axios.create(), {
+  maxRequests: 1,
+  perMilliseconds: 1500,
+});
+
+var allGamesId = [];
+var len = 0;
+
+var count = 0;
+var allGamesFull = [];
+var categories = [];
+var genres = [];
+
 /************************************************/
 
 await fetchAllGames();
@@ -20,49 +33,40 @@ fetchSteamData()
 
 /************************************************/
 
-const http = rateLimit(axios.create(), {
-  maxRequests: 1,
-  perMilliseconds: 1500,
-});
-
-var allGamesId = [];
-var len = 0;
-
-var count = 0;
-var allGamesFull = [];
-var categories = [];
-var genres = [];
-
 async function fetchAllGames() {
-  loadFromFile("./data/allGamesId.txt", true)
+  const loaded = await loadFromFile("./data/allGamesId.txt", true)
     .then((it) => {
       allGamesId = it;
+      len = allGamesId.length;
+      return true;
     })
     .catch((err) => {
       console.log(err);
-      http
-        .get(
-          "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json"
-        )
-        .then((response) => {
-          allGamesId = removeDuplicate(
-            response.data.applist.apps.map((app) => app.appid)
-          );
-
-          fs.writeFile(
-            "./data/allGamesId.txt",
-            JSON.stringify(allGamesId),
-            (e) => {
-              if (e) {
-                console.log(e);
-              }
-            }
-          );
-        });
-    })
-    .finally(() => {
-      len = allGamesId.length;
+      return false;
     });
+
+  if (!loaded) {
+    await http
+      .get(
+        "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json"
+      )
+      .then((response) => {
+        allGamesId = removeDuplicate(
+          response.data.applist.apps.map((app) => app.appid)
+        );
+        len = allGamesId.length;
+
+        fs.writeFile(
+          "./data/allGamesId.txt",
+          JSON.stringify(allGamesId),
+          (e) => {
+            if (e) {
+              console.log(e);
+            }
+          }
+        );
+      });
+  }
 }
 
 async function loadLocalData() {
