@@ -5,6 +5,21 @@ import fs from "fs";
 
 import { loadFromFile, removeDuplicate, areArraysEqual } from "./helper.js";
 
+/************************************************/
+
+await fetchAllGames();
+await loadLocalData();
+
+fetchSteamData()
+  .catch((e) => {
+    console.log(e);
+  })
+  .finally(() => {
+    saveSteamData();
+  });
+
+/************************************************/
+
 const http = rateLimit(axios.create(), {
   maxRequests: 1,
   perMilliseconds: 1500,
@@ -17,18 +32,6 @@ var count = 0;
 var allGamesFull = [];
 var categories = [];
 var genres = [];
-
-// Load all data
-await fetchAllGames();
-await loadLocalData();
-
-fetchSteamData()
-  .catch((e) => {
-    console.log(e);
-  })
-  .finally(() => {
-    saveSteamData();
-  });
 
 async function fetchAllGames() {
   loadFromFile("./data/allGamesId.txt", true)
@@ -136,19 +139,25 @@ async function fetchSteamData() {
 
     nonNullCategories.forEach((gameCategory) => {
       if (!categories.find((c) => c.id == gameCategory.id)) {
+        gameCategory._id = gameCategory.id;
+        delete gameCategory.id;
+
         categories.push(gameCategory);
       }
     });
 
     nonNullGenres.forEach((gameGenre) => {
       if (!genres.find((g) => g.id == gameGenre.id)) {
+        gameGenre._id = gameGenre.id;
+        delete gameGenre.id;
+
         genres.push(gameGenre);
       }
     });
 
     // Put successful game into gameFull
     const gameFull = {};
-    gameFull.id = id;
+    gameFull._id = id;
     gameFull.name = gameData.name;
     gameFull.type = gameData.type;
     if (gameData.fullgame != null) {
