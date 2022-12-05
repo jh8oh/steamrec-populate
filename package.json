@@ -5,6 +5,7 @@
   "scripts": {
     "save-local": "node ./src/save-local.js",
     "update-local": "node ./src/update-local.js",
+    "get-tags": "node ./src/get-tags.js",
     "mongo": "node ./src/mongodb.js"
   },
   "keywords": [],

@@ -209,7 +209,7 @@ async function fetchSteamData() {
 }
 
 async function saveSteamData() {
-  fs.writeFile("./data/count.txt", count, (e) => {
+  fs.writeFile("./data/count.txt", count.toString(), (e) => {
     if (e) {
       console.log(e);
     }
