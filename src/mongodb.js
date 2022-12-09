@@ -10,6 +10,7 @@ try {
   insertGames();
   insertCategories();
   insertGenres();
+  insertTags();
 } catch (err) {
   console.log(err);
 }
@@ -64,6 +65,23 @@ async function insertGenres() {
       console.log(`Inserting ${filteredGenres.length} genres`);
       if (filteredGenres.length > 0) {
         insert("genres", filteredGenres);
+      }
+    })
+    .catch((err) => {
+      throw err;
+    });
+}
+
+async function insertTags(){
+  const tags = await loadFromFile("./data/tags.txt", true).catch((err) => {
+    throw err;
+  });
+
+  filterExisting("tags", tags)
+    .then((filteredTags) => {
+      console.log(`Inserting ${filteredTags.length} tags`);
+      if (filteredTags.length > 0) {
+        insert("tags", filteredTags);
       }
     })
     .catch((err) => {
