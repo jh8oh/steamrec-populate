@@ -398,7 +398,7 @@ var players = [
   "Online Co-Op",
   "Singleplayer",
   "Party Game",
-  "Party"
+  "Party",
 ];
 
 var other = [
@@ -479,7 +479,7 @@ var assessment = [
   "Wholesome",
   "Cozy",
   "Philisophical",
-  "Well-Written"
+  "Well-Written",
 ];
 
 var ratings = [
@@ -513,63 +513,49 @@ var tags = await loadFromFile("./data/tags.txt", true).catch((err) => {
 for (let i = 0; i < tags.length; ++i) {
   let tag = tags[i];
   let added = false;
-  let type = [];
 
   if (topLevel.includes(tag.description)) {
     added = true;
-    type.push(0);
-  }
-  if (genres.includes(tag.description)) {
+    tag.type = 0;
+  } else if (genres.includes(tag.description)) {
     added = true;
-    type.push(1);
-  }
-  if (subGenres.includes(tag.description)) {
+    tag.type = 1;
+  } else if (subGenres.includes(tag.description)) {
     added = true;
-    type.push(2);
-  }
-  if (visualsAndViewpoint.includes(tag.description)) {
+    tag.type = 2;
+  } else if (visualsAndViewpoint.includes(tag.description)) {
     added = true;
-    type.push(3);
-  }
-  if (themesAndMoods.includes(tag.description)) {
+    tag.type = 3;
+  } else if (themesAndMoods.includes(tag.description)) {
     added = true;
-    type.push(4);
-  }
-  if (features.includes(tag.description)) {
+    tag.type = 4;
+  } else if (features.includes(tag.description)) {
     added = true;
-    type.push(5);
-  }
-  if (players.includes(tag.description)) {
+    tag.type = 5;
+  } else if (players.includes(tag.description)) {
     added = true;
-    type.push(6);
-  }
-  if (other.includes(tag.description)) {
+    tag.type = 6;
+  } else if (other.includes(tag.description)) {
     added = true;
-    type.push(7);
-  }
-  if (software.includes(tag.description)) {
+    tag.type = 7;
+  } else if (software.includes(tag.description)) {
     added = true;
-    type.push(8);
-  }
-  if (assessment.includes(tag.description)) {
+    tag.type = 8;
+  } else if (assessment.includes(tag.description)) {
     added = true;
-    type.push(9);
-  }
-  if (ratings.includes(tag.description)) {
+    tag.type = 9;
+  } else if (ratings.includes(tag.description)) {
     added = true;
-    type.push(10);
-  }
-  if (hardware.includes(tag.description)) {
+    tag.type = 10;
+  } else if (hardware.includes(tag.description)) {
     added = true;
-    type.push(11);
-  }
-  if (fundings.includes(tag.description)) {
+    tag.type = 11;
+  } else if (fundings.includes(tag.description)) {
     added = true;
-    type.push(12);
+    tag.type = 12;
   }
 
   if (added) {
-    tag.type = type;
     console.log(`${tag.description} - Passed`);
   } else {
     console.log(`${tag.description} - Failed`);
