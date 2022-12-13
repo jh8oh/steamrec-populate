@@ -8,9 +8,6 @@ dotenvConfig();
 /************************************************/
 try {
   insertGames();
-  insertCategories();
-  insertGenres();
-  insertTags();
 } catch (err) {
   console.log(err);
 }
@@ -18,7 +15,7 @@ try {
 
 async function insertGames() {
   const allGamesFull = await loadFromFile(
-    "./data/allGamesFull.txt",
+    "./data/allGamesFullFullFull.txt",
     true
   ).catch((err) => {
     throw err;
