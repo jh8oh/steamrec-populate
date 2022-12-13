@@ -6,10 +6,15 @@ import { containsAny, areArraysEqual } from "./helper.js";
 
 // Variables
 
-const http = rateLimit(axios.create(), {
+const steamPowered = rateLimit(axios.create(), {
   maxRequests: 1,
   perMilliseconds: 1500,
 });
+const steamSpy = rateLimit(axios.create(), {
+  maxRequests: 1,
+  perMilliseconds: 1000,
+});
+
 const allSteamAppsUrl =
   "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json";
 const steamAppInfoUrl = "https://store.steampowered.com/api/appdetails?";
@@ -18,7 +23,7 @@ const steamAppTagsUrl = "https://steamspy.com/api.php?";
 // Public functions
 
 export async function getSteamAppIds() {
-  return http
+  return steamPowered
     .get(allSteamAppsUrl)
     .then((response) => [
       ...new Set(response.data.applist.apps.map((app) => app.appid)),
@@ -34,9 +39,9 @@ export async function getSteamAppInfo(id) {
       request: "appdetails",
       appid: id,
     });
-    const [appInfoResponse, appTagsResponse] = await Promises.all([
-      http.get(steamAppInfoUrl + appInfoQuery),
-      http.get(steamAppTagsUrl + appTagsQuery),
+    const [appInfoResponse, appTagsResponse] = await Promise.all([
+      steamPowered.get(steamAppInfoUrl + appInfoQuery),
+      steamSpy.get(steamAppTagsUrl + appTagsQuery),
     ]).catch(() => {
       return reject(id);
     });

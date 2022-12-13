@@ -16,7 +16,7 @@ export async function getSavedAppIds() {
 }
 
 export async function saveApp(app) {
-  getDatabase().then((db) => db.collection("apps").insert(app));
+  getDatabase().then((db) => db.collection("apps").insertOne(app));
 }
 
 // Private functions
