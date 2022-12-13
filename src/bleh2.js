@@ -29,6 +29,9 @@ for (let i in allGamesFull) {
   if (allGamesFull[i].genres != null) {
     allGamesFull[i].genres = allGamesFull[i].genres.map((g) => g.description);
   }
+  if (allGamesFull[i].tags != null) {
+    allGamesFull[i].tags = allGamesFull[i].tags.map((t) => t.description);
+  }
 }
 
 fs.writeFile(

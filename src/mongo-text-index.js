@@ -13,7 +13,7 @@ MongoClient.connect(process.env.MONGODB_URI)
           publishers: "text",
           categories: "text",
           genres: "text",
-          "tags.description": "text",
+          tags: "text",
         },
         {
           name: "RecommendIndex",
@@ -22,7 +22,7 @@ MongoClient.connect(process.env.MONGODB_URI)
             publishers: 3,
             categories: 1,
             genres: 2,
-            "tags.description": 4,
+            tags: 4,
           },
         }
       );
